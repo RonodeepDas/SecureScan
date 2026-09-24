@@ -5,11 +5,12 @@ services:
     rootDir: backend
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /docs
     envVars:
       - key: ENCRYPTION_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://ronodeepdas.github.io
+        value: https://ronodeepdas.github.io,https://www.ronodeepdas.github.io
       - key: PYTHON_VERSION
         value: 3.13.7

@@ -13,7 +13,7 @@ import axios from "axios";
 import { getTargetValidationError } from "./portValidation";
 
 const API_BASE = (
-  import.meta.env.VITE_API_BASE_URL || "https://securescan-api.onrender.com"
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
 ).replace(/\/$/, "");
 const API = `${API_BASE}/api`;
 
