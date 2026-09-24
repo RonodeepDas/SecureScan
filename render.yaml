@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: securescan-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://ronodeepdas.github.io
+      - key: PYTHON_VERSION
+        value: 3.13.7
