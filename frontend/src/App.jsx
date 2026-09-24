@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import PasswordChecker from './PasswordChecker'
-import PortScanner from './PortScanner'
+import { useState } from "react";
+import PasswordChecker from "./PasswordChecker";
+import PortScanner from "./PortScanner";
 
 const TABS = [
-  { id: 'password', label: 'Password Checker', icon: '🔐' },
-  { id: 'scanner', label: 'Port Scanner', icon: '🛡️' },
-]
+  { id: "password", label: "Password Checker", icon: "🔐" },
+  { id: "scanner", label: "Port Scanner", icon: "🛡️" },
+];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('password')
+  const [activeTab, setActiveTab] = useState("password");
 
   return (
     <div className="min-h-screen bg-gray-950 relative overflow-hidden">
@@ -29,8 +29,30 @@ export default function App() {
             </h1>
           </div>
           <p className="text-gray-400 text-sm max-w-md mx-auto">
-            Security toolkit for developers. All password checks run entirely in your browser — nothing is transmitted.
+            Security toolkit for developers. All password checks run entirely in
+            your browser — nothing is transmitted.
           </p>
+          <p className="mt-3 text-sm text-indigo-300 font-medium">
+            Developed by Ronodeep Das, Tania Guha Biswas, and Anubhab Sahoo
+          </p>
+          <div className="mt-2 flex flex-col items-center gap-1 text-xs">
+            <a
+              href="https://ronodeepdas.github.io/SecureScan/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-cyan-300 hover:text-cyan-200 underline"
+            >
+              Project live on GitHub Pages
+            </a>
+            <a
+              href="https://github.com/RonodeepDas/SecureScan"
+              target="_blank"
+              rel="noreferrer"
+              className="text-violet-300 hover:text-violet-200 underline"
+            >
+              GitHub repository
+            </a>
+          </div>
         </header>
 
         {/* Tab bar */}
@@ -45,8 +67,8 @@ export default function App() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
               }`}
             >
               <span>{tab.icon}</span>
@@ -61,26 +83,43 @@ export default function App() {
             id="panel-password"
             role="tabpanel"
             aria-labelledby="tab-password"
-            hidden={activeTab !== 'password'}
+            hidden={activeTab !== "password"}
           >
-            {activeTab === 'password' && <PasswordChecker />}
+            {activeTab === "password" && <PasswordChecker />}
           </div>
           <div
             id="panel-scanner"
             role="tabpanel"
             aria-labelledby="tab-scanner"
-            hidden={activeTab !== 'scanner'}
+            hidden={activeTab !== "scanner"}
           >
-            {activeTab === 'scanner' && <PortScanner />}
+            {activeTab === "scanner" && <PortScanner />}
           </div>
         </main>
 
         {/* Footer */}
         <footer className="text-center mt-12 text-gray-600 text-xs">
-          SecureScan — local dev only · history endpoints have no auth ·{' '}
-          <span className="text-indigo-400">use responsibly</span>
+          SecureScan — local dev only · history endpoints have no auth ·{" "}
+          <a
+            href="https://ronodeepdas.github.io/SecureScan/"
+            className="text-indigo-400 underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub Pages demo
+          </a>{" "}
+          ·{" "}
+          <a
+            href="https://github.com/RonodeepDas/SecureScan"
+            className="text-indigo-400 underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub repo
+          </a>{" "}
+          · <span className="text-indigo-400">use responsibly</span>
         </footer>
       </div>
     </div>
-  )
+  );
 }

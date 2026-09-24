@@ -2,7 +2,17 @@
 
 SecureScan is a local-first security toolkit for checking password strength and performing authorized port scans. It combines a browser-only password analyzer with a FastAPI backend that stores encrypted history and validates scan requests before running any network probes.
 
-Live project repo: https://github.com/RonodeepDas/SecureScan
+Developed by Ronodeep Das, Tania Guha Biswas, and Anubhab Sahoo.
+
+Live project demo: https://ronodeepdas.github.io/SecureScan/
+GitHub repository: https://github.com/RonodeepDas/SecureScan
+Project contributors: Ronodeep Das, Tania Guha Biswas, Anubhab Sahoo
+
+## About the Project
+
+SecureScan is designed to help users evaluate password resilience and monitor network exposure in a safe, ethical, and privacy-conscious way. The password checker runs entirely in the browser using zxcvbn, so the original password never leaves the user’s device. The port scanner requires explicit authorization before running any scan and restricts requests with validation checks for target format, port range, and scan volume.
+
+The project stores encrypted metadata in SQLite using AES-256-GCM, keeping the app local-first while preserving a clear audit trail for password and scan history. It is intended for responsible security testing on systems that the user owns or has explicit written permission to assess.
 
 ## Features
 

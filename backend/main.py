@@ -70,6 +70,7 @@ app = FastAPI(
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+init_db()
 
 allowed_origins = [
     "https://localhost:5173",
@@ -78,6 +79,8 @@ allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:5173",
     "https://127.0.0.1:5173",
+    "https://ronodeepdas.github.io",
+    "https://www.ronodeepdas.github.io",
 ]
 extra_origins = os.getenv("CORS_ORIGINS", "")
 if extra_origins:
@@ -88,6 +91,7 @@ if extra_origins:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.github\.io$|https?://localhost(:\d+)?$|https?://127\.0\.0\.1(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

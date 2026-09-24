@@ -11,17 +11,36 @@ Wire format (base64url-encoded):
 import base64
 import binascii
 import os
+from pathlib import Path
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from dotenv import load_dotenv
 
-load_dotenv()
+ENV_PATH = Path(__file__).resolve().parent / ".env"
 
 _NONCE_SIZE = 12  # 96-bit nonce recommended for GCM
 _KEY_SIZE = 32    # 256-bit key
 
 
+def _ensure_env_key() -> None:
+    """Create a local .env encryption key when one has not been configured."""
+    raw = os.environ.get("ENCRYPTION_KEY", "").strip()
+    if raw:
+        return
+
+    load_dotenv(ENV_PATH, override=False)
+    raw = os.environ.get("ENCRYPTION_KEY", "").strip()
+    if raw:
+        return
+
+    generated = binascii.hexlify(os.urandom(32)).decode()
+    ENV_PATH.write_text(f"ENCRYPTION_KEY={generated}\n", encoding="utf-8")
+    os.environ["ENCRYPTION_KEY"] = generated
+    print("[SecureScan] Created backend/.env with a generated ENCRYPTION_KEY.")
+
+
 def _load_key() -> bytes:
+    _ensure_env_key()
     raw = os.environ.get("ENCRYPTION_KEY", "")
     if not raw:
         raise EnvironmentError(

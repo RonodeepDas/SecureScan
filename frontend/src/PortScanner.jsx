@@ -11,8 +11,10 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
-const API = API_BASE ? `${API_BASE}/api` : "/api";
+const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL || "https://securescan-api.onrender.com"
+).replace(/\/$/, "");
+const API = `${API_BASE}/api`;
 
 const DEFAULT_PORTS_STR = "21,22,23,25,53,80,110,143,443,3306,3389,8080";
 
