@@ -71,14 +71,23 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+allowed_origins = [
+    "https://localhost:5173",
+    "https://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "https://127.0.0.1:5173",
+]
+extra_origins = os.getenv("CORS_ORIGINS", "")
+if extra_origins:
+    allowed_origins.extend(
+        origin.strip() for origin in extra_origins.split(",") if origin.strip()
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://localhost:5173",
-        "https://localhost:3000",
-        "http://localhost:5173",   # Vite dev (HTTP fallback)
-        "http://localhost:3000",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -86,15 +95,15 @@ app.add_middleware(
 
 
 # ---------------------------------------------------------------------------
-# Startup: DB init + self-signed cert
+# Startup: DB init + optional TLS setup
 # ---------------------------------------------------------------------------
 
-CERT_FILE = Path("cert.pem")
-KEY_FILE = Path("key.pem")
+CERT_FILE = Path(os.getenv("SECURESCAN_TLS_CERT", "cert.pem"))
+KEY_FILE = Path(os.getenv("SECURESCAN_TLS_KEY", "key.pem"))
 
 
 def _generate_self_signed_cert() -> None:
-    """Generate a self-signed TLS cert for local HTTPS dev (valid 1 year)."""
+    """Generate a local self-signed cert only when explicitly enabled."""
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
     subject = issuer = x509.Name([
@@ -128,14 +137,15 @@ def _generate_self_signed_cert() -> None:
             serialization.NoEncryption(),
         )
     )
-    print("[SecureScan] Generated self-signed dev cert (cert.pem / key.pem).")
+    print("[SecureScan] Generated self-signed dev cert for explicit local HTTPS testing.")
 
 
 @app.on_event("startup")
 def startup_event():
     init_db()
-    if not CERT_FILE.exists() or not KEY_FILE.exists():
-        _generate_self_signed_cert()
+    if os.getenv("SECURESCAN_ALLOW_SELF_SIGNED", "false").lower() == "true":
+        if not CERT_FILE.exists() or not KEY_FILE.exists():
+            _generate_self_signed_cert()
 
 
 # ---------------------------------------------------------------------------
@@ -375,16 +385,36 @@ def get_scan_history(db: Annotated[Session, Depends(get_db)]):
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # Ensure cert exists before uvicorn starts
-    if not CERT_FILE.exists() or not KEY_FILE.exists():
-        _generate_self_signed_cert()
+    cert_path = os.getenv("SECURESCAN_TLS_CERT")
+    key_path = os.getenv("SECURESCAN_TLS_KEY")
 
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        ssl_keyfile=str(KEY_FILE),
-        ssl_certfile=str(CERT_FILE),
-        log_level="info",
-        reload=False,
-    )
+    if cert_path and key_path:
+        uvicorn.run(
+            "main:app",
+            host="0.0.0.0",
+            port=8000,
+            ssl_keyfile=key_path,
+            ssl_certfile=cert_path,
+            log_level="info",
+            reload=False,
+        )
+    elif os.getenv("SECURESCAN_ALLOW_SELF_SIGNED", "false").lower() == "true":
+        if not CERT_FILE.exists() or not KEY_FILE.exists():
+            _generate_self_signed_cert()
+        uvicorn.run(
+            "main:app",
+            host="0.0.0.0",
+            port=8000,
+            ssl_keyfile=str(KEY_FILE),
+            ssl_certfile=str(CERT_FILE),
+            log_level="info",
+            reload=False,
+        )
+    else:
+        uvicorn.run(
+            "main:app",
+            host="0.0.0.0",
+            port=8000,
+            log_level="info",
+            reload=False,
+        )

@@ -147,6 +147,29 @@ SecureScan is designed for ethical, authorized security testing on systems you o
 
 Never run port scans against systems without authorization.
 
+## Secure Online Publishing
+
+For public deployment, do not use the project’s self-signed local certificate flow. The app is designed to run in two secure modes:
+
+1. Local development: plain HTTP by default, no browser warning.
+2. Production deployment: real TLS certificates and trusted hosts.
+
+Use these environment variables in production:
+
+```bash
+# frontend
+VITE_API_BASE_URL=https://your-api-domain.example.com
+
+# backend
+SECURESCAN_TLS_CERT=/etc/ssl/certs/securescan.crt
+SECURESCAN_TLS_KEY=/etc/ssl/private/securescan.key
+CORS_ORIGINS=https://your-frontend-domain.example.com
+```
+
+For a GitHub Pages frontend, host the React app on GitHub Pages and keep the Python API on a HTTPS-capable backend provider such as Render, Railway, Fly.io, or a managed VPS.
+
+GitHub Pages alone cannot run the FastAPI backend, but it can serve the frontend securely over HTTPS without the self-signed browser warning.
+
 ## Local Run Summary
 
 ```bash
