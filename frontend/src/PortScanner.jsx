@@ -8,8 +8,9 @@
  *   4. Port list is validated client-side before sending (must be 1..65535, ≤1024).
  */
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import axios from "axios";
+import { getTargetValidationError } from "./portValidation";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL || "https://securescan-api.onrender.com"
@@ -145,10 +146,17 @@ export default function PortScanner() {
       : ports.length > 1024
         ? "Maximum 1024 ports per scan"
         : null;
+  const targetError = getTargetValidationError(target);
 
-  const canScan = authorized && target.trim() && !portError;
+  const canScan = authorized && !targetError && !portError;
 
   const handleScan = async () => {
+    const validationError = getTargetValidationError(target);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setError(null);
     setResults(null);
     setSaveMsg(null);
@@ -245,7 +253,7 @@ export default function PortScanner() {
           <input
             id="scan-target"
             type="text"
-            className="input-field font-mono"
+            className={`input-field font-mono ${targetError ? "ring-2 ring-red-500/50" : ""}`}
             placeholder="127.0.0.1 or hostname.local"
             value={target}
             onChange={(e) => {
@@ -255,6 +263,9 @@ export default function PortScanner() {
             autoComplete="off"
             spellCheck={false}
           />
+          {targetError && (
+            <p className="text-xs text-red-400 mt-1.5">{targetError}</p>
+          )}
         </div>
 
         {/* Ports */}
